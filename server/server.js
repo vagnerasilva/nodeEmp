@@ -17,40 +17,41 @@ var msg ={}
 //###################### VERIFICANDO SAP ##########################################################/////
 
 // Chamada constanto do SAP para verificar fila de eventos a realizar
-var myVar = setInterval(function(){ myTimer() }, 400); // A acada 10 segundos verifica no SAP se tem pedidos em fila
+var myVar = setInterval(function(){ myTimer() }, 4000); // A acada 10 segundos verifica no SAP se tem pedidos em fila
 
 function myTimer() {
   cont++
       console.log("Buscando pedidos no SAP : "+cont);
+     
       var request = require("request");
 
       var options = { method: 'GET',
-        url: 'https://iotmmsp1942341624trial.hanatrial.ondemand.com/com.sap.iotservices.mms/v1/api/http/data/63344e9a-43d9-48ee-97c6-583672cfe842',
+        url: 'https://iotmmsp1942419907trial.hanatrial.ondemand.com/com.sap.iotservices.mms/v1/api/http/data/5c6a6674-b193-4c69-bc62-f32a3fdd39c7',
         headers: 
-        { 'postman-token': 'ae9a44cb-85d3-a841-4429-d94f2388e1c3',
+        { 'postman-token': 'a0b230ba-10ba-354c-39c6-1e0a692700a8',
           'cache-control': 'no-cache',
-          'content-type': 'application/json;chartset=utf-8',
-          authorization: 'Bearer e88562ce4f6e114ebed995e12129e82b' } };
+          'content-type': 'application/json',
+          authorization: 'Bearer f3c1d3e8ecbb4a7da81b5a6f695458d' } };
 
       request(options, function (error, response, body) {
         if (error) throw new Error(error);
 
-        
-              var parsed = JSON.parse(body);
+       // console.log(body);
+        var parsed = JSON.parse(body);
               
               for(var x in parsed){ // Buscando itens no objeto e colocando no array
-              fila.push(parsed[x]);
+                  fila.push(parsed[x]);
               }
-          
+
       });
 
 
 
 // Quando existir uma Fila e a EMPILHADEIRA ja tiver terminado a TAREFA DELA 
 if(fila.length>0 && status.ok==true ){
-   console.log(" A Fila tem" + fila.length +" Enviando Pedido mais velho");
+   console.log(" A Fila tem : " + fila.length +" Enviando Pedido mais velho");
     chamarEmpi(fila[0]); // 
-    fila.shift();
+    
   // console.log(fila.length);
  }
 
@@ -61,12 +62,11 @@ if(fila.length>0 && status.ok==true ){
 //###################### Enviando PEDIDO EMPILHADEIRA ##########################################################/////
 function chamarEmpi(pedido){
     status.ok= false;
-    console.log(" A Empilhadeira vai receber esta ORDEM ")
+    console.log(" A Empilhadeira vai receber a ORDEM :"+ pedido.messages[0].TransfOrder)
     console.log("PosFrom" + pedido.messages[0].PosFrom)
     console.log("PosTo" + pedido.messages[0].PosTo)
-
+  
     var http = require("http");
-
     var ordemEmp = {
       "method": "GET",
       "hostname": "localhost",
@@ -77,7 +77,6 @@ function chamarEmpi(pedido){
         "postman-token": "214c8d25-9009-e80f-f09c-b22525e1db47"
       }
     };
-
     var req = http.request(ordemEmp, function (res) {
       var chunks = [];
 
@@ -94,12 +93,40 @@ function chamarEmpi(pedido){
 
 req.end();
 }
-
 //###################### Enviando PEDIDO EMPILHADEIRA ##########################################################/////
 
+//###################### Enviando POST SAP ordem EXECUTADA ################################################///
+function respostaSAP(infopedido){
+ 
+  
 
+var request = require("request");
 
+var options = { method: 'POST',
+  url: 'https://iotmmsp1942419907trial.hanatrial.ondemand.com/com.sap.iotservices.mms/v1/api/http/data/5c6a6674-b193-4c69-bc62-f32a3fdd39c7',
+  headers: 
+   { 'postman-token': '726a5c28-0f15-2f43-7189-2d2ed276ae91',
+     'cache-control': 'no-cache',
+     'content-type': 'application/json',
+     authorization: 'Bearer f3c1d3e8ecbb4a7da81b5a6f695458d' },
+  body: 
+   { mode: 'sync',
+     messageType: '6132ab2a5a463b8356a7',
+     messages: [ { TransfOrder: infopedido.messages[0].TransfOrder ,
+                   Confirm: 'true' } 
+               ] },
+  json: true };
 
+request(options, function (error, response, body) {
+  if (error) throw new Error(error);
+
+ // console.log(body);
+});
+console.log(" ORDEM EXECUTADA POST ENVIADO AO SAP :" + infopedido.messages[0].TransfOrder );
+
+}
+
+//###################### Enviando POST SAP ordem EXECUTADA ################################################///
 
 
 
@@ -123,8 +150,10 @@ app.get('/teste', function (req, res) {
 
 app.get('/resEmpilha', function (req, res) {
 
-  console.log("estou livre denovo OK CHEGOU")
+  console.log("Confirmacao Ordem Executada AGORA LIVRE PRO PROXIMO")
   status.ok= true;
+  respostaSAP(fila[0])
+  fila.shift();
   res.send('respondido!');
  
 });

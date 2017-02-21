@@ -69,9 +69,7 @@ function chamarEmpi(pedido){
     var http = require("http");
     var ordemEmp = {
       "method": "GET",
-      "hostname": "localhost",
-      "port": "5000",
-      "path": "/chamada?=" + pedido.messages[0].PosFrom + pedido.messages[0].PosTo,
+      "hostname": "192.168.0.80/2,3",
       "headers": {
         "cache-control": "no-cache",
         "postman-token": "214c8d25-9009-e80f-f09c-b22525e1db47"

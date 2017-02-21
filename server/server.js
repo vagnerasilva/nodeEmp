@@ -17,7 +17,7 @@ var msg ={}
 //###################### VERIFICANDO SAP ##########################################################/////
 
 // Chamada constanto do SAP para verificar fila de eventos a realizar
-var myVar = setInterval(function(){ myTimer() }, 4000); // A acada 10 segundos verifica no SAP se tem pedidos em fila
+var myVar = setInterval(function(){ myTimer() }, 500); // A acada 10 segundos verifica no SAP se tem pedidos em fila
 
 function myTimer() {
   cont++
@@ -35,7 +35,7 @@ function myTimer() {
 
       request(options, function (error, response, body) {
         if (error) throw new Error(error);
-
+          console.log(error);
        // console.log(body);
         var parsed = JSON.parse(body);
               

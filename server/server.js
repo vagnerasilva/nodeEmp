@@ -164,6 +164,7 @@ app.get('/teste', function (req, res) {
 
 app.get('/ordem', function (req, res) {
   console.log("chamando empilhadeira");
+  chamarEmpFake()
   res.send('Empilhadeira recebeu ordem');
 
   var request = require("request");

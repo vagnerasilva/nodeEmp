@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
-app.listen(4000, function () {
-  console.log('Example app listening on port 4000!');
+app.listen(3000, function () {
+  console.log('Example app listening on port 3000!');
 });
 
 
@@ -10,7 +10,7 @@ app.listen(4000, function () {
 var cont = 0;
 var status={};
 status.ok= true;
-status.ordemEmp= "3,4";
+
 var fila =[];
 var valor ={}
 var msg ={}
@@ -21,10 +21,8 @@ var myVar = setInterval(function(){ myTimer() }, 1000); // A acada 10 segundos v
 
 function myTimer() {
   cont++
-      console.log("Buscando pedidos no SAP : "+cont);
-     
+      console.log("Buscas no SAP : "+cont);
       var request = require("request");
-
       var options = { method: 'GET',
         url: 'https://iotmmsp1942419907trial.hanatrial.ondemand.com/com.sap.iotservices.mms/v1/api/http/data/5c6a6674-b193-4c69-bc62-f32a3fdd39c7',
         headers: 
@@ -32,33 +30,23 @@ function myTimer() {
           'cache-control': 'no-cache',
           'content-type': 'application/json',
           authorization: 'Bearer f3c1d3e8ecbb4a7da81b5a6f695458d' } };
-
-      request(options, function (error, response, body) {
-     //   if (error) throw new Error(error);
-         // console.log(error);
-       // console.log(body);
+      request(options, function (error, response, body) {  // Ignorando Erro se por acaso nao completar o GET
+        //if (error) throw new Error(error);
+        //console.log(error);
+        //console.log(body);
        if (!error && response.statusCode == 200) {
          var parsed = JSON.parse(body);
               for(var x in parsed){ // Buscando itens no objeto e colocando no array
                   fila.push(parsed[x]);
               }
           }
-
-        
-
-      });
-
-
-
+      }); 
+      ///#### Construindo FILA com os pedidos vindos do SAP ######///
 // Quando existir uma Fila e a EMPILHADEIRA ja tiver terminado a TAREFA DELA 
 if(fila.length>0 && status.ok==true ){
-   console.log(" A Fila tem : " + fila.length +" Enviando Pedido mais velho");
+   console.log(" Tamanho da Fila tem : " + fila.length );
     chamarEmpi(fila[0]); // 
-    
-  // console.log(fila.length);
  }
-
-
 } // Fim da funcao de repeticao 
 //###################### VERIFICANDO SAP ##########################################################/////
 
@@ -69,40 +57,19 @@ function chamarEmpi(pedido){
     console.log("PosFrom" + pedido.messages[0].PosFrom)
     console.log("PosTo" + pedido.messages[0].PosTo)
   
-    var http = require("http");
-    var ordemEmp = {
-      "method": "GET",
-      "hostname": "http://192.168.0.62",
-      "port": "5000",
-      "path": "/chamada?=" + pedido.messages[0].PosFrom + pedido.messages[0].PosTo,
-      "headers": {
-        "cache-control": "no-cache",
-        "postman-token": "214c8d25-9009-e80f-f09c-b22525e1db47"
-      }
+
+    var request = require("request");
+    var options = { method: 'GET',
+      url: 'http://192.168.0.80/'+ pedido.messages[0].PosFrom +','+ pedido.messages[0].PosTo
     };
-    var req = http.request(ordemEmp, function (res) {
-      var chunks = [];
-
-      res.on("data", function (chunk) {
-        chunks.push(chunk);
-        
-      });
-
-    res.on("end", function () {
-      var body = Buffer.concat(chunks);
-      console.log(body.toString());
+    console.log(options.url); // Comando para a Empilhadeira
+    request(options, function (error, response, body) {
     });
-});
-
-req.end();
 }
 //###################### Enviando PEDIDO EMPILHADEIRA ##########################################################/////
 
 //###################### Enviando POST SAP ordem EXECUTADA ################################################///
 function respostaSAP(infopedido){
- 
-  
-
 var request = require("request");
 
 var options = { method: 'POST',
@@ -131,15 +98,8 @@ console.log(" ORDEM EXECUTADA POST ENVIADO AO SAP :" + infopedido.messages[0].Tr
 
 //###################### Enviando POST SAP ordem EXECUTADA ################################################///
 
-
-
-
-
-
-
-
-
-
+val1 = 2;
+val2 = 4;
 
 //##### ENVIO DE PEDIDO PARA EMPILHADEIRA#####/////
 
@@ -147,22 +107,24 @@ console.log(" ORDEM EXECUTADA POST ENVIADO AO SAP :" + infopedido.messages[0].Tr
 app.get('/teste', function (req, res) {
   console.log("chamando empilhadeira");
   res.send('Empilhadeira recebeu ordem');
- // chamarEmpi();
+  chamarEmpi();
+
+});
 
 
+app.get('/ordem', function (req, res) {
+  console.log("chamando empilhadeira");
+  res.send('Empilhadeira recebeu ordem');
 
+  var request = require("request");
 
-var request = require("request");
+  var options = { method: 'GET',
+    url: 'http://192.168.0.80/'+ val1 +','+ val2
+  };
+  console.log(options.url); // Comando para a Empilhadeira
+  request(options, function (error, response, body) {
+});
 
-var options = { method: 'GET',
-  url: 'http://192.168.0.80/1-3'
-			 };
-
-request(options, function (error, response, body) {
-  if (!error && response.statusCode == 200) {
-    console.log("Funciona"); // Show the HTML for the Google homepage.
-  }
-  
 });
 
 
@@ -171,7 +133,9 @@ request(options, function (error, response, body) {
 
 
 
-});
+
+
+
 
 
 app.get('/resEmpilha', function (req, res) {

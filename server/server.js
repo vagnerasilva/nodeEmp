@@ -4,7 +4,12 @@ app.listen(3000, function () {
   console.log('Example app listening on port 3000!');
 });
 
-
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
 
 var cont = 0;
@@ -21,7 +26,7 @@ var myVar = setInterval(function(){ myTimer() }, 1000); // A acada 10 segundos v
 
 function myTimer() {
   cont++
-      console.log("Buscas no SAP : "+cont);
+      console.log("Buscas no SAP : "+cont + "  Status EMP: " +status.ok );
       var request = require("request");
       var options = { method: 'GET',
         url: 'https://iotmmsp1942419907trial.hanatrial.ondemand.com/com.sap.iotservices.mms/v1/api/http/data/5c6a6674-b193-4c69-bc62-f32a3fdd39c7',
@@ -45,7 +50,8 @@ function myTimer() {
 // Quando existir uma Fila e a EMPILHADEIRA ja tiver terminado a TAREFA DELA 
 if(fila.length>0 && status.ok==true ){
    console.log(" Tamanho da Fila tem : " + fila.length );
-    chamarEmpi(fila[0]); // 
+    //chamarEmpi(fila[0]); //
+    chamarEmpFake(fila[0]); 
  }
 } // Fim da funcao de repeticao 
 //###################### VERIFICANDO SAP ##########################################################/////
@@ -53,9 +59,9 @@ if(fila.length>0 && status.ok==true ){
 //###################### Enviando PEDIDO EMPILHADEIRA ##########################################################/////
 function chamarEmpi(pedido){
     status.ok= false;
-    console.log(" A Empilhadeira vai receber a ORDEM :"+ pedido.messages[0].TransfOrder)
-    console.log("PosFrom" + pedido.messages[0].PosFrom)
-    console.log("PosTo" + pedido.messages[0].PosTo)
+  //  console.log(" A Empilhadeira vai receber a ORDEM :"+ pedido.messages[0].TransfOrder)
+  //  console.log("PosFrom" + pedido.messages[0].PosFrom)
+  //  console.log("PosTo" + pedido.messages[0].PosTo)
   
 
     var request = require("request");
@@ -67,6 +73,50 @@ function chamarEmpi(pedido){
     });
 }
 //###################### Enviando PEDIDO EMPILHADEIRA ##########################################################/////
+
+//###################### Enviando PEDIDO EMPfake ##########################################################/////
+function chamarEmpFake(pedido){
+    status.ok= false;
+   // console.log(" A Empilhadeira vai receber a ORDEM :"+ pedido.messages[0].TransfOrder)
+   // console.log("PosFrom" + pedido.messages[0].PosFrom)
+   // console.log("PosTo" + pedido.messages[0].PosTo)
+  
+    var http = require("http");
+    var ordemEmp = {
+      "method": "GET",
+      "hostname": "localhost",
+      "port": "5000",
+      "path": "/chamada?=" ,
+      "headers": {
+        "cache-control": "no-cache",
+        "postman-token": "214c8d25-9009-e80f-f09c-b22525e1db47"
+      }
+    };
+    var req = http.request(ordemEmp, function (res) {
+      var chunks = [];
+
+      res.on("data", function (chunk) {
+        chunks.push(chunk);
+        
+      });
+
+    res.on("end", function () {
+      var body = Buffer.concat(chunks);
+     // console.log(body.toString());
+    });
+});
+
+req.end();
+console.log("Pedido fake feito");
+}
+//###################### Enviando PEDIDO EMPILHADEIRA ##########################################################/////
+
+
+
+
+
+
+
 
 //###################### Enviando POST SAP ordem EXECUTADA ################################################///
 function respostaSAP(infopedido){
@@ -82,7 +132,7 @@ var options = { method: 'POST',
   body: 
    { mode: 'sync',
      messageType: '6132ab2a5a463b8356a7',
-     messages: [ { TransfOrder: infopedido.messages[0].TransfOrder ,
+     messages: [ { TransfOrder: '1234567890', //infopedido.messages[0].TransfOrder ,
                    Confirm: 'true' } 
                ] },
   json: true };
@@ -92,7 +142,7 @@ request(options, function (error, response, body) {
 
  // console.log(body);
 });
-console.log(" ORDEM EXECUTADA POST ENVIADO AO SAP :" + infopedido.messages[0].TransfOrder );
+console.log(" ORDEM EXECUTADA POST ENVIADO AO SAP :"); //+ infopedido.messages[0].TransfOrder );
 
 }
 
@@ -107,8 +157,8 @@ val2 = 4;
 app.get('/teste', function (req, res) {
   console.log("chamando empilhadeira");
   res.send('Empilhadeira recebeu ordem');
-  chamarEmpi();
-
+ // chamarEmpi();
+    chamarEmpFake()
 });
 
 

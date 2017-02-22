@@ -1,0 +1,17 @@
+
+
+Editar na linha 4
+
+var ipEMP = 'http://192.168.0.80/'
+
+com o IP da Empilhadeira
+
+
+
+Executar node server.js
+
+17/02/17
+
+obs: Partes de resposta da Empilhadeira e pedidos acima de 1 Implementados mas Desligados
+
+VAGNER

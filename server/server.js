@@ -1,9 +1,8 @@
 var express = require('express');
 var app = express();
-
-
+//###########################################################################
 var ipEMP = 'http://192.168.0.80/'
-
+//#########################################################################
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!');
 });
@@ -52,7 +51,7 @@ function myTimer() {
       }); 
       ///#### Construindo FILA com os pedidos vindos do SAP ######///
 // Quando existir uma Fila e a EMPILHADEIRA ja tiver terminado a TAREFA DELA 
-if(fila.length>0 && fila.length<2 ){ //&& status.ok==true ){  // status True e para quando eu tiver resposta da Empilhadeira
+if(fila.length>0 ){ //&& status.ok==true ){  // status True e para quando eu tiver resposta da Empilhadeira
    console.log(" Tamanho da Fila tem : " + fila.length );
     chamarEmpi(fila[0]); //
   //  chamarEmpFake(fila[0]); 
@@ -186,7 +185,7 @@ app.get('/teste', function (req, res) {
 
 app.get('/ordem', function (req, res) {
   console.log("chamando empilhadeira");
-  chamarEmpFake()
+//  chamarEmpFake() desligado pq nao tem resposta
   res.send('Empilhadeira recebeu ordem');
 
   var request = require("request");
@@ -196,6 +195,7 @@ app.get('/ordem', function (req, res) {
   };
   console.log(options.url); // Comando para a Empilhadeira
   request(options, function (error, response, body) {
+    
 });
 
 });

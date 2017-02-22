@@ -1,5 +1,9 @@
 var express = require('express');
 var app = express();
+
+
+var ipEMP = 'http://192.168.0.80/'
+
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!');
 });
@@ -26,7 +30,7 @@ var myVar = setInterval(function(){ myTimer() }, 1000); // A acada 10 segundos v
 
 function myTimer() {
   cont++
-      console.log("Buscas no SAP : "+cont + "  Status EMP: " +status.ok );
+      console.log("Buscas no SAP : "+cont  ); //+ "  Status EMP: " +status.ok ); // Quando eu tiver respostas da Empilhadeira
       var request = require("request");
       var options = { method: 'GET',
         url: 'https://iotmmsp1942419907trial.hanatrial.ondemand.com/com.sap.iotservices.mms/v1/api/http/data/5c6a6674-b193-4c69-bc62-f32a3fdd39c7',
@@ -48,31 +52,41 @@ function myTimer() {
       }); 
       ///#### Construindo FILA com os pedidos vindos do SAP ######///
 // Quando existir uma Fila e a EMPILHADEIRA ja tiver terminado a TAREFA DELA 
-if(fila.length>0 && status.ok==true ){
+if(fila.length>0 && fila.length<2 ){ //&& status.ok==true ){  // status True e para quando eu tiver resposta da Empilhadeira
    console.log(" Tamanho da Fila tem : " + fila.length );
     chamarEmpi(fila[0]); //
-    chamarEmpFake(fila[0]); 
+  //  chamarEmpFake(fila[0]); 
+
  }
 } // Fim da funcao de repeticao 
 //###################### VERIFICANDO SAP ##########################################################/////
 
+
+
 //###################### Enviando PEDIDO EMPILHADEIRA ##########################################################/////
 function chamarEmpi(pedido){
     status.ok= false;
-  //  console.log(" A Empilhadeira vai receber a ORDEM :"+ pedido.messages[0].TransfOrder)
-  //  console.log("PosFrom" + pedido.messages[0].PosFrom)
-  //  console.log("PosTo" + pedido.messages[0].PosTo)
+    console.log(" A Empilhadeira vai receber a ORDEM :"+ pedido.messages[0].TransfOrder)
+    console.log("PosFrom" + pedido.messages[0].PosFrom)
+   console.log("PosTo" + pedido.messages[0].PosTo)
   
+
 
     var request = require("request");
     var options = { method: 'GET',
-      url: 'http://192.168.0.80/'+ pedido.messages[0].PosFrom +','+ pedido.messages[0].PosTo
+      url: ipEMP + pedido.messages[0].PosFrom +','+ pedido.messages[0].PosTo   // ipEMP configurado na linha 2 
     };
     console.log(options.url); // Comando para a Empilhadeira
     request(options, function (error, response, body) {
     });
 }
 //###################### Enviando PEDIDO EMPILHADEIRA ##########################################################/////
+
+//##############AREA DE TESTES ###########################////
+
+
+
+
 
 //###################### Enviando PEDIDO EMPfake ##########################################################/////
 function chamarEmpFake(pedido){
@@ -113,11 +127,16 @@ console.log("Pedido fake feito");
 
 
 
+//################### SO LIGAR QUANDO TIVER RESPOSTA DA EMPILHADEIRA ########################///
+app.get('/resEmpilha', function (req, res) {
 
-
-
-
-
+  console.log("Confirmacao Ordem Executada AGORA LIVRE PRO PROXIMO")
+  status.ok= true;
+  respostaSAP(fila[0])
+  fila.shift();
+  res.send('respondido!');
+ 
+});
 //###################### Enviando POST SAP ordem EXECUTADA ################################################///
 function respostaSAP(infopedido){
 var request = require("request");
@@ -148,17 +167,20 @@ console.log(" ORDEM EXECUTADA POST ENVIADO AO SAP :"); //+ infopedido.messages[0
 
 //###################### Enviando POST SAP ordem EXECUTADA ################################################///
 
-val1 = 2;
-val2 = 4;
+
 
 //##### ENVIO DE PEDIDO PARA EMPILHADEIRA#####/////
 
 /// Criar chamada automatica da empilhadeira
+
+val1 = 2;
+val2 = 4;
+
 app.get('/teste', function (req, res) {
   console.log("chamando empilhadeira");
   res.send('Empilhadeira recebeu ordem');
  // chamarEmpi();
-    chamarEmpFake()
+  //  chamarEmpFake()
 });
 
 
@@ -170,7 +192,7 @@ app.get('/ordem', function (req, res) {
   var request = require("request");
 
   var options = { method: 'GET',
-    url: 'http://192.168.0.80/'+ val1 +','+ val2
+    url: ipEMP + val1 +','+ val2
   };
   console.log(options.url); // Comando para a Empilhadeira
   request(options, function (error, response, body) {
@@ -189,12 +211,3 @@ app.get('/ordem', function (req, res) {
 
 
 
-app.get('/resEmpilha', function (req, res) {
-
-  console.log("Confirmacao Ordem Executada AGORA LIVRE PRO PROXIMO")
-  status.ok= true;
-  respostaSAP(fila[0])
-  fila.shift();
-  res.send('respondido!');
- 
-});

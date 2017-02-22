@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!');
+app.listen(4000, function () {
+  console.log('Example app listening on port 4000!');
 });
 
 
@@ -17,7 +17,7 @@ var msg ={}
 //###################### VERIFICANDO SAP ##########################################################/////
 
 // Chamada constanto do SAP para verificar fila de eventos a realizar
-var myVar = setInterval(function(){ myTimer() }, 500); // A acada 10 segundos verifica no SAP se tem pedidos em fila
+var myVar = setInterval(function(){ myTimer() }, 1000); // A acada 10 segundos verifica no SAP se tem pedidos em fila
 
 function myTimer() {
   cont++
@@ -34,14 +34,17 @@ function myTimer() {
           authorization: 'Bearer f3c1d3e8ecbb4a7da81b5a6f695458d' } };
 
       request(options, function (error, response, body) {
-        if (error) throw new Error(error);
-          console.log(error);
+     //   if (error) throw new Error(error);
+         // console.log(error);
        // console.log(body);
-        var parsed = JSON.parse(body);
-              
+       if (!error && response.statusCode == 200) {
+         var parsed = JSON.parse(body);
               for(var x in parsed){ // Buscando itens no objeto e colocando no array
                   fila.push(parsed[x]);
               }
+          }
+
+        
 
       });
 
@@ -69,7 +72,9 @@ function chamarEmpi(pedido){
     var http = require("http");
     var ordemEmp = {
       "method": "GET",
-      "hostname": "192.168.0.80/2,3",
+      "hostname": "localhost",
+      "port": "5000",
+      "path": "/chamada?=" + pedido.messages[0].PosFrom + pedido.messages[0].PosTo,
       "headers": {
         "cache-control": "no-cache",
         "postman-token": "214c8d25-9009-e80f-f09c-b22525e1db47"
@@ -140,8 +145,31 @@ console.log(" ORDEM EXECUTADA POST ENVIADO AO SAP :" + infopedido.messages[0].Tr
 
 /// Criar chamada automatica da empilhadeira
 app.get('/teste', function (req, res) {
+  console.log("chamando empilhadeira");
   res.send('Empilhadeira recebeu ordem');
  // chamarEmpi();
+
+
+
+
+var request = require("request");
+
+var options = { method: 'GET',
+  url: 'http://192.168.0.80/1-3'
+			 };
+
+request(options, function (error, response, body) {
+  if (!error && response.statusCode == 200) {
+    console.log("Funciona"); // Show the HTML for the Google homepage.
+  }
+  
+});
+
+
+
+
+
+
 
 });
 

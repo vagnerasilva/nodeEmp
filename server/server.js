@@ -50,7 +50,7 @@ function myTimer() {
 // Quando existir uma Fila e a EMPILHADEIRA ja tiver terminado a TAREFA DELA 
 if(fila.length>0 && status.ok==true ){
    console.log(" Tamanho da Fila tem : " + fila.length );
-    //chamarEmpi(fila[0]); //
+    chamarEmpi(fila[0]); //
     chamarEmpFake(fila[0]); 
  }
 } // Fim da funcao de repeticao 

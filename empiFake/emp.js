@@ -65,7 +65,7 @@ function gatilho(){
     req.end();
     console.log("Ja Terminei a ordem devolvendo STATUS");
 
-  },15000);
+  },30000);
 }
 
 

@@ -72,7 +72,7 @@ function chamarEmpi(pedido){
     var http = require("http");
     var ordemEmp = {
       "method": "GET",
-      "hostname": "localhost",
+      "hostname": "http://192.168.0.62",
       "port": "5000",
       "path": "/chamada?=" + pedido.messages[0].PosFrom + pedido.messages[0].PosTo,
       "headers": {

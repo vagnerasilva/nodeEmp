@@ -1,12 +1,14 @@
+Para Instalar do inicio entrar dentro da pasta server e Executar 
+npm install e depois node server
 
-
+Para funcionamento 
 Editar na linha 4
 
 var ipEMP = 'http://192.168.0.80/'
 
 com o IP da Empilhadeira
 
-
+depois 
 
 Executar node server.js
 

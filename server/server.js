@@ -54,6 +54,7 @@ function myTimer() {
 if(fila.length>0 ){ //&& status.ok==true ){  // status True e para quando eu tiver resposta da Empilhadeira
    console.log(" Tamanho da Fila tem : " + fila.length );
     chamarEmpi(fila[0]); //
+    fila.shift(); /// depois de chamado apagando item da fila !!!!!!
   //  chamarEmpFake(fila[0]); 
 
  }

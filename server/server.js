@@ -32,23 +32,27 @@ function myTimer() {
       console.log("Buscas no SAP : "+cont  ); //+ "  Status EMP: " +status.ok ); // Quando eu tiver respostas da Empilhadeira
       var request = require("request");
       var options = { method: 'GET',
-        url: 'https://iotmmsp1942419907trial.hanatrial.ondemand.com/com.sap.iotservices.mms/v1/api/http/data/5c6a6674-b193-4c69-bc62-f32a3fdd39c7',
-        headers: 
-        { 'postman-token': 'a0b230ba-10ba-354c-39c6-1e0a692700a8',
-          'cache-control': 'no-cache',
-          'content-type': 'application/json',
-          authorization: 'Bearer f3c1d3e8ecbb4a7da81b5a6f695458d' } };
+        url: 'https://iotmmsp1942419907trial.hanatrial.ondemand.com/com.sap.iotservices.mms/v1/api/http/data/a166fc5b-b4a5-42d6-940b-7057e12742fc',
+          headers: 
+                  {
+     'cache-control': 'no-cache',
+     'content-type': 'application/json',
+     authorization: 'Bearer 98261d5697d7d0dab7252956039bdde' } };
       request(options, function (error, response, body) {  // Ignorando Erro se por acaso nao completar o GET
         //if (error) throw new Error(error);
         //console.log(error);
         //console.log(body);
+        console.log(response.statusCode);
        if (!error && response.statusCode == 200) {
          var parsed = JSON.parse(body);
               for(var x in parsed){ // Buscando itens no objeto e colocando no array
                   fila.push(parsed[x]);
+                  console.log(fila);
               }
           }
       }); 
+
+
       ///#### Construindo FILA com os pedidos vindos do SAP ######///
 // Quando existir uma Fila e a EMPILHADEIRA ja tiver terminado a TAREFA DELA 
 if(fila.length>0 ){ //&& status.ok==true ){  // status True e para quando eu tiver resposta da Empilhadeira
